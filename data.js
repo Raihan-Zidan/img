@@ -20,8 +20,10 @@ async function handleRequest(request) {
       // Ambil data gambar sebagai ArrayBuffer
       const imageData = await imageResponse.arrayBuffer()
 
-      // Load modul WASM
-      const wasmModule = await WebAssembly.compileStreaming(fetch('./djpeg-static.wasm'))
+      // Load modul WASM dari file yang sudah diunggah
+      const wasmResponse = await fetch('./djpeg-static.wasm')
+      const wasmBuffer = await wasmResponse.arrayBuffer()
+      const wasmModule = await WebAssembly.compile(wasmBuffer)
       const instance = await WebAssembly.instantiate(wasmModule)
 
       // Alokasikan memori untuk gambar input dan output
