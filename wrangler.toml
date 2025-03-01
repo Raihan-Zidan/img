@@ -12,4 +12,4 @@ bucket = "./"  # Direktori tempat file WASM berada
 entry-point = "worker"  # Entry point Worker Anda
 
 [wasm_modules]
-djpeg = "./djpeg-static.wasm"
+DJPG = "./djpeg-static.wasm"
