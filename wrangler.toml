@@ -9,7 +9,6 @@ enabled = true
 
 [site]
 bucket = "./"  # Direktori tempat file WASM berada
-entry-point = "worker"  # Entry point Worker Anda
 
 [wasm_modules]
 DJPG = "./djpeg-static.wasm"
