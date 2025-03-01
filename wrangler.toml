@@ -5,7 +5,7 @@ compatibility_date = "2025-02-16"
 
 [observability]
 enabled = true
-[[wasm_modules]]
-name = "libjpeg"
-module = "./djpeg-static.wasm"
+
+[wasm_modules]
+libjpeg = "./djpeg-static.wasm"
 
