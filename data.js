@@ -5,9 +5,12 @@ addEventListener('fetch', event => {
 async function handleRequest(request) {
   try {
     // Muat modul WASM yang sudah dikonfigurasi di wrangler.toml
-    const DJPG = await import('./djpeg-static.wasm')
+    const wasmModule = await import('./djpeg-static.wasm')
 
-    // Cek fungsi yang diekspor oleh modul WASM
+    // Akses objek default yang diekspor
+    const DJPG = wasmModule.default
+
+    // Cek properti/fungsi yang ada di objek default
     const wasmExports = Object.keys(DJPG)
 
     // Cetak fungsi yang diekspor
