@@ -7,4 +7,4 @@ compatibility_date = "2025-02-16"
 enabled = true
 
 [wasm_modules]
-DJPG = "./djpeg-static.wasm"
+DJPG = "djpeg-static.wasm"
