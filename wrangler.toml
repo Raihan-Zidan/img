@@ -9,6 +9,3 @@ enabled = true
 
 [site]
 bucket = "./"  # Direktori tempat file WASM berada
-
-[wasm_modules]
-DJPG = "./djpeg-static.wasm"
