@@ -1,5 +1,5 @@
-// Import modul WASM
-import DJPG from 'DJPG'  // Nama modul harus sama dengan yang didefinisikan di wrangler.toml
+import DJPG from "./djpeg-static.wasm"; // Gunakan path relatif
+
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
