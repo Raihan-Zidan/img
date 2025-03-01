@@ -21,7 +21,7 @@ async function handleRequest(request) {
       const imageData = await imageResponse.arrayBuffer()
 
       // Load modul WASM dari file yang sudah diunggah
-      const wasmResponse = await fetch('./djpeg-static.wasm')
+      const wasmResponse = await fetch('https://raihan-zidan.github.io/img/djpeg-static.wasm')
       const wasmBuffer = await wasmResponse.arrayBuffer()
       const wasmModule = await WebAssembly.compile(wasmBuffer)
       const instance = await WebAssembly.instantiate(wasmModule)
