@@ -16,56 +16,42 @@ export default {
 
       const imgBuffer = await imgRes.arrayBuffer();
 
-      // Dummy imports, tambahin banyak fungsi biar gak error terus
+      // Dummy imports, masih pakai banyak fungsi
       const imports = {
         env: {
           memory: new WebAssembly.Memory({ initial: 256, maximum: 512 }),
           abort: () => {
             throw new Error("WASM aborted (dari env.abort)");
           },
-          print_log: (msg) => {
-            throw new Error(`WASM log: ${msg}`);
-          },
         },
         a: {
           a: () => 42,
           b: () => 42,
-          c: () => 42,
-          d: () => 42,
-          e: () => 42,
-          f: () => 42,
-          g: () => 42,
-          h: () => 42,
-          i: () => 42,
-          j: () => 42,
-          k: () => 42,
-          l: () => 42,
-          m: () => 42,
-          n: () => 42,
-          o: () => 42,
-          p: () => 42,
-          q: () => 42,
-          r: () => 42,
-          s: () => 42,
-          t: () => 42,
-          u: () => 42,
-          v: () => 42,
-          w: () => 42,
-          x: () => 42,
-          y: () => 42,
-          z: () => 42,
         },
       };
 
-      // Instantiate WASM dengan imports
-      const wasmInstance = await WebAssembly.instantiate(wasmModule, imports);
-      const { resize } = wasmInstance.instance.exports;
+      // Coba instantiate WASM
+      let wasmInstance;
+      try {
+        const wasmObj = await WebAssembly.instantiate(wasmModule, imports);
+        wasmInstance = wasmObj.instance;
+      } catch (wasmErr) {
+        throw new Error(`Gagal instantiate WASM: ${wasmErr.message}`);
+      }
+
+      if (!wasmInstance) {
+        throw new Error("wasmInstance tidak terdefinisi");
+      }
+
+      if (!wasmInstance.exports || !wasmInstance.exports.resize) {
+        throw new Error("Fungsi 'resize' tidak ditemukan dalam WASM");
+      }
 
       // Buat buffer untuk output
       const input = new Uint8Array(imgBuffer);
       const output = new Uint8Array(input.length);
 
-      resize(input, output, 200, 200); // Sesuaikan ukuran
+      wasmInstance.exports.resize(input, output, 200, 200);
 
       return new Response(output, {
         headers: { "Content-Type": "image/jpeg" },
