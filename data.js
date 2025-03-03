@@ -1,37 +1,36 @@
+import wasmUrl from "./djpeg-static.wasm";
+
 export default {
   async fetch(req) {
     const url = new URL(req.url);
-    const query = url.searchParams.get("q");
-    if (!query) return new Response("Missing query coyy", { status: 400 });
+    const imageUrl = url.searchParams.get("url");
 
-    // Delay random 2-5 detik sebelum request ke Play Store
-    const delay = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    if (!imageUrl) {
+      return new Response("Parameter ?url= harus diisi", { status: 400 });
+    }
 
-    const playStoreUrl = `https://play.google.com/store/search?q=${encodeURIComponent(query)}&c=games`;
-    const response = await fetch(playStoreUrl, { headers: { "User-Agent": "Mozilla/5.0" }, referer: 'https://play.google.com/' });
+    try {
+      // Ambil gambar dari URL
+      const imgRes = await fetch(imageUrl);
+      if (!imgRes.ok) throw new Error("Gagal mengambil gambar");
 
-    if (!response.ok) return new Response("Failed to fetch Play Store", { status: response.status });
+      const imgBuffer = await imgRes.arrayBuffer();
 
-    const html = await response.text();
-    const results = extractPlayStoreData(html);
+      // Load WASM
+      const wasmModule = await WebAssembly.instantiateStreaming(fetch(wasmUrl));
+      const { resize } = wasmModule.instance.exports;
 
-    return new Response(JSON.stringify(results), { headers: { "Content-Type": "application/json" } });
+      // Buat buffer untuk output (sesuaikan jika perlu)
+      const input = new Uint8Array(imgBuffer);
+      const output = new Uint8Array(input.length);
+
+      resize(input, output, 200, 200); // Sesuaikan ukuran
+
+      return new Response(output, {
+        headers: { "Content-Type": "image/jpeg" },
+      });
+    } catch (err) {
+      return new Response(`Error: ${err.message}`, { status: 500 });
+    }
   },
 };
-
-function extractPlayStoreData(html) {
-  const results = [];
-  const regex = /<a\s+href="\/store\/apps\/details\?id=([^"]+)"[^>]*>\s*<img[^>]+src="([^"]+)"[^>]*>.*?<div[^>]+class="[^"]*">\s*([^<]+)\s*<\/div>.*?<div[^>]+>\s*(\d\.\d)\s*<\/div>/gs;
-
-  let match;
-  while ((match = regex.exec(html)) !== null && results.length < 3) {
-    results.push({
-      title: match[3].trim(),
-      thumbnail: match[2],
-      rating: match[4],
-      url: `https://play.google.com/store/apps/details?id=${match[1]}`,
-    });
-  }
-  return results;
-}
