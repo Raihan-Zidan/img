@@ -1,4 +1,4 @@
-import wasmUrl from "./djpeg-static.wasm";
+import wasmModule from "./djpeg-static.wasm";
 
 export default {
   async fetch(req) {
@@ -16,11 +16,9 @@ export default {
 
       const imgBuffer = await imgRes.arrayBuffer();
 
-      // Load WASM sebagai ArrayBuffer
-      const wasmRes = await fetch(wasmUrl);
-      const wasmBuffer = await wasmRes.arrayBuffer();
-      const wasmModule = await WebAssembly.instantiate(wasmBuffer);
-      const { resize } = wasmModule.instance.exports;
+      // Langsung instantiate WASM
+      const wasmInstance = await WebAssembly.instantiate(wasmModule);
+      const { resize } = wasmInstance.instance.exports;
 
       // Buat buffer untuk output (sesuaikan jika perlu)
       const input = new Uint8Array(imgBuffer);
