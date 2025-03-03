@@ -2,14 +2,14 @@ export default {
   async fetch(req) {
     const url = new URL(req.url);
     const query = url.searchParams.get("q");
-    if (!query) return new Response("Missing query", { status: 400 });
+    if (!query) return new Response("Missing query coyy", { status: 400 });
 
     // Delay random 2-5 detik sebelum request ke Play Store
     const delay = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000;
     await new Promise(resolve => setTimeout(resolve, delay));
 
     const playStoreUrl = `https://play.google.com/store/search?q=${encodeURIComponent(query)}&c=games`;
-    const response = await fetch(playStoreUrl, { headers: { "User-Agent": "Mozilla/5.0" } });
+    const response = await fetch(playStoreUrl, { headers: { "User-Agent": "Mozilla/5.0" }, referer: 'https://play.google.com/' });
 
     if (!response.ok) return new Response("Failed to fetch Play Store", { status: response.status });
 
