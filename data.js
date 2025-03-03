@@ -3,8 +3,8 @@ import wasmModule from "./djpeg-static.wasm";
 export default {
   async fetch(req) {
     try {
-      // Instantiate WASM
-      const wasmObj = await WebAssembly.instantiate(wasmModule);
+      // Instantiate WASM dengan imports kosong
+      const wasmObj = await WebAssembly.instantiate(wasmModule, {});
       const wasmInstance = wasmObj.instance;
 
       // Cek apakah instance berhasil dibuat
