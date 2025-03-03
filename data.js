@@ -3,15 +3,20 @@ import wasmModule from "./djpeg-static.wasm";
 export default {
   async fetch(req) {
     try {
-      // Compile dulu untuk cek struktur WASM
-      const module = await WebAssembly.compile(wasmModule);
+      // Instantiate WASM
+      const wasmObj = await WebAssembly.instantiate(wasmModule);
+      const wasmInstance = wasmObj.instance;
 
-      // Ambil daftar import & export
-      const imports = WebAssembly.Module.imports(module);
-      const exports = WebAssembly.Module.exports(module);
+      // Cek apakah instance berhasil dibuat
+      if (!wasmInstance) {
+        throw new Error("wasmInstance tidak terdefinisi");
+      }
+
+      // Ambil daftar exports
+      const exports = Object.keys(wasmInstance.exports);
 
       return new Response(
-        JSON.stringify({ imports, exports }, null, 2),
+        JSON.stringify({ exports }, null, 2),
         { headers: { "Content-Type": "application/json" } }
       );
     } catch (err) {
