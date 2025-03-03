@@ -16,15 +16,17 @@ export default {
 
       const imgBuffer = await imgRes.arrayBuffer();
 
-      // Load WASM
-      const wasmModule = await WebAssembly.instantiateStreaming(fetch(wasmUrl));
+      // Load WASM sebagai ArrayBuffer
+      const wasmRes = await fetch(wasmUrl);
+      const wasmBuffer = await wasmRes.arrayBuffer();
+      const wasmModule = await WebAssembly.instantiate(wasmBuffer);
       const { resize } = wasmModule.instance.exports;
 
       // Buat buffer untuk output (sesuaikan jika perlu)
       const input = new Uint8Array(imgBuffer);
       const output = new Uint8Array(input.length);
 
-      resize(input, output, 200, 200); // Sesuaikan ukuran
+      resize(input, output, 200, 200); // Sesuaikan ukuran sesuai fungsi di WASM
 
       return new Response(output, {
         headers: { "Content-Type": "image/jpeg" },
