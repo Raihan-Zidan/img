@@ -16,8 +16,19 @@ export default {
 
       const imgBuffer = await imgRes.arrayBuffer();
 
-      // Langsung instantiate WASM
-      const wasmInstance = await WebAssembly.instantiate(wasmModule);
+      // Buat memory untuk WASM jika diperlukan
+      const memory = new WebAssembly.Memory({ initial: 256, maximum: 512 });
+
+      // Buat import object (bisa diubah sesuai kebutuhan WASM)
+      const imports = {
+        env: {
+          memory, // Jika WASM butuh memory
+          abort: () => console.log("WASM aborted"), // Untuk menangani error
+        },
+      };
+
+      // Instantiate WASM dengan import object
+      const wasmInstance = await WebAssembly.instantiate(wasmModule, imports);
       const { resize } = wasmInstance.instance.exports;
 
       // Buat buffer untuk output (sesuaikan jika perlu)
