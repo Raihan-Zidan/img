@@ -16,7 +16,7 @@ export default {
 
       const imgBuffer = await imgRes.arrayBuffer();
 
-      // Dummy imports, tambahin pesan error kalau ada masalah
+      // Dummy imports, kasih fungsi yang valid untuk module "a"
       const imports = {
         env: {
           memory: new WebAssembly.Memory({ initial: 256, maximum: 512 }),
@@ -28,9 +28,7 @@ export default {
           },
         },
         a: {
-          some_function: () => {
-            throw new Error("Function 'some_function' dipanggil");
-          },
+          a: () => 42, // Fungsi valid, kembalikan angka (dummy)
         },
       };
 
