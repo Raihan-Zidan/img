@@ -1,4 +1,4 @@
-import jpeg from 'https://esm.sh/jpeg-js';
+import { jpeg } from './jpeg-js-bundled.js';
 
 export default {
   async fetch(request) {
@@ -19,8 +19,6 @@ export default {
 
     // Decode JPEG
     const rawImageData = jpeg.decode(uint8Array, { useTArray: true });
-
-    console.log(rawImageData); // Debugging output
 
     return new Response(JSON.stringify({
       width: rawImageData.width,
