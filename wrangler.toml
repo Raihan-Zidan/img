@@ -11,7 +11,7 @@ enabled = true
 bucket = "./"  # Direktori tempat file WASM berada
 
 [build]
-command = "npx esbuild data.js --bundle --outdir=dist"
+command = "npx esbuild data.js --bundle --outdir=dist --loader:.wasm=wasm"
 
 [vars]
 WASM_FILE = "djpeg-static.wasm"
