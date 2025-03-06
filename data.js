@@ -1,4 +1,4 @@
-importScripts("jpeg-js-bundled.js");
+const jpeg = require("./jpeg-js-bundled.js");
 
 addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
