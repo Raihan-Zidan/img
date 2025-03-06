@@ -10,5 +10,6 @@ enabled = true
 [site]
 bucket = "./"  # Direktori tempat file WASM berada
 
+compatibility_flags = [ "nodejs_compat" ]
 
 
