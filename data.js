@@ -1,35 +1,41 @@
-import { decode } from "@jsquash/jpeg";
+importScripts("jpeg-js-bundled.js");
 
-export default {
-  async fetch(request) {
+addEventListener("fetch", (event) => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  try {
+    // Ambil URL gambar dari parameter
     const url = new URL(request.url);
-    const imageUrl = url.searchParams.get('url');
+    const imageUrl = url.searchParams.get("url");
 
     if (!imageUrl) {
       return new Response("Missing ?url parameter", { status: 400 });
     }
 
-    // Fetch image from URL
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      return new Response("Failed to fetch image", { status: 400 });
+    // Fetch gambar
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      return new Response("Failed to fetch image", { status: 500 });
     }
 
-    const arrayBuffer = await imageResponse.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    // Convert ke ArrayBuffer
+    const buffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(buffer);
 
-    // Decode JPEG using @jsquash/jpeg
-    const decodedImage = await decode(uint8Array);
+    // Decode JPEG pakai jpeg-js
+    const decoded = jpeg.decode(uint8Array, { useTArray: true });
 
-    return new Response(
-      JSON.stringify({
-        width: decodedImage.width,
-        height: decodedImage.height,
-        dataLength: decodedImage.data.byteLength,
-      }),
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  },
-};
+    // Encode kembali dengan quality 50
+    const encoded = jpeg.encode(decoded, 50); // 50 = kualitas
+
+    // Return hasil compress
+    return new Response(encoded.data, {
+      headers: { "Content-Type": "image/jpeg" },
+    });
+
+  } catch (error) {
+    return new Response(`Error: ${error.message}`, { status: 500 });
+  }
+}
