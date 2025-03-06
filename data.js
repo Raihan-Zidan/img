@@ -1,6 +1,6 @@
-import { Hono } from 'hono';
-import { decode, encode } from 'jpeg-js-bundled.js';
-import axios from 'axios';
+const { Hono } = require('hono');
+const { decode, encode } = require('jpeg-js');
+const axios = require('axios');
 
 const app = new Hono();
 
@@ -25,4 +25,4 @@ app.get('/compress', async (c) => {
   }
 });
 
-export default app;
+module.exports = app;
