@@ -1,4 +1,4 @@
-import { decode } from "https://esm.sh/@jsquash/jpeg";
+import { decode } from "@jsquash/jpeg";
 
 export default {
   async fetch(request) {
