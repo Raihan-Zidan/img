@@ -1,4 +1,4 @@
-import jpeg from './jpeg-js-bundled.js';
+import * as jpeg from './jpeg-js-bundled.js';
 
 export default {
   async fetch(request) {
@@ -20,7 +20,7 @@ export default {
       const uint8Array = new Uint8Array(arrayBuffer);
 
       // Decode JPEG
-      const rawImageData = jpeg.decode(uint8Array, { useTArray: true });
+      const rawImageData = jpeg.default.decode(uint8Array, { useTArray: true });
 
       return new Response(JSON.stringify({
         width: rawImageData.width,
