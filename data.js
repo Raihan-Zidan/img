@@ -1,41 +1,28 @@
-const jpeg = require("./jpeg-js-bundled.js");
+import { Hono } from 'hono';
+import { decode, encode } from 'jpeg-js-bundled.js';
+import axios from 'axios';
 
-addEventListener("fetch", (event) => {
-  event.respondWith(handleRequest(event.request));
+const app = new Hono();
+
+app.get('/compress', async (c) => {
+  const url = c.req.query('url');
+  const quality = parseInt(c.req.query('quality') || '75', 10);
+
+  if (!url) return c.text('Missing ?url parameter', 400);
+  if (isNaN(quality) || quality < 1 || quality > 100) return c.text('Invalid quality value', 400);
+
+  try {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const image = decode(Buffer.from(response.data));
+    const compressedImage = encode(image, quality);
+
+    return c.body(compressedImage.data, 200, {
+      'Content-Type': 'image/jpeg',
+      'Cache-Control': 'max-age=3600',
+    });
+  } catch (err) {
+    return c.text('Failed to process image', 500);
+  }
 });
 
-async function handleRequest(request) {
-  try {
-    // Ambil URL gambar dari parameter
-    const url = new URL(request.url);
-    const imageUrl = url.searchParams.get("url");
-
-    if (!imageUrl) {
-      return new Response("Missing ?url parameter", { status: 400 });
-    }
-
-    // Fetch gambar
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      return new Response("Failed to fetch image", { status: 500 });
-    }
-
-    // Convert ke ArrayBuffer
-    const buffer = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(buffer);
-
-    // Decode JPEG pakai jpeg-js
-    const decoded = jpeg.decode(uint8Array, { useTArray: true });
-
-    // Encode kembali dengan quality 50
-    const encoded = jpeg.encode(decoded, 50); // 50 = kualitas
-
-    // Return hasil compress
-    return new Response(encoded.data, {
-      headers: { "Content-Type": "image/jpeg" },
-    });
-
-  } catch (error) {
-    return new Response(`Error: ${error.message}`, { status: 500 });
-  }
-}
+export default app;
