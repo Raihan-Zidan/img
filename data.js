@@ -1,31 +1,29 @@
-import wasmModule from "./djpeg-static.wasm";
-
 export default {
-  async fetch(req) {
-    try {
-      // Dummy imports biar gak error
-      const imports = {
-        a: {}, // Pastikan 'a' ada sebagai objek
-        env: {}, // Tambahkan 'env' kalau perlu
-      };
+    async fetch(request, env, ctx) {
+        // URL file WASM, ganti dengan lokasi file lo
+        const wasmUrl = "./djpeg-static.wasm";
 
-      // Instantiate WASM dengan imports
-      const wasmObj = await WebAssembly.instantiate(wasmModule, imports);
-      const wasmInstance = wasmObj.instance;
+        // Ambil WASM dari URL
+        const response = await fetch(wasmUrl);
+        const wasmBuffer = await response.arrayBuffer();
 
-      if (!wasmInstance) {
-        throw new Error("wasmInstance tidak terdefinisi");
-      }
+        // Inisialisasi WASM dengan objek import kosong (atau sesuaikan)
+        const { instance } = await WebAssembly.instantiate(wasmBuffer, {
+            env: {
+                memory: new WebAssembly.Memory({ initial: 256 }),
+                console_log: (val) => console.log("WASM log:", val),
+            }
+        });
 
-      // Ambil daftar exports
-      const exports = Object.keys(wasmInstance.exports);
+        // Debug: Cek fungsi yang diekspor
+        console.log("Exports:", instance.exports);
 
-      return new Response(
-        JSON.stringify({ exports }, null, 2),
-        { headers: { "Content-Type": "application/json" } }
-      );
-    } catch (err) {
-      return new Response(`Error saat memeriksa WASM: ${err.message}`, { status: 500 });
+        // Contoh panggil fungsi ekspor
+        if (instance.exports.m) {
+            const result = instance.exports.m(10, 20); // Sesuaikan param
+            return new Response(`Hasil dari WASM: ${result}`);
+        }
+
+        return new Response("Modul WASM berhasil di-load, tapi fungsi tidak ditemukan.");
     }
-  },
 };
