@@ -1,20 +1,30 @@
-import wasmModule from './djpeg-static.wasm';
+const wasmUrl = new URL('./djpeg-static.wasm', import.meta.url);
 
+async function initWasm() {
+    const response = await fetch(wasmUrl);
+    const wasmBuffer = await response.arrayBuffer();
+
+    // Load WASM
+    const { instance } = await WebAssembly.instantiate(wasmBuffer, {
+        env: {
+            memory: new WebAssembly.Memory({ initial: 256 })
+        }
+    });
+
+    return instance.exports;
+}
+
+// Cloudflare Worker handler
 export default {
-    async fetch(request, env, ctx) {
-        // WASM sudah otomatis di-load oleh bundler
-        const { instance } = await WebAssembly.instantiate(wasmModule, {
-            env: {
-                memory: new WebAssembly.Memory({ initial: 256 }),
-                console_log: (val) => console.log("WASM log:", val),
-            }
-        });
+    async fetch(request) {
+        const url = new URL(request.url);
 
-        console.log("Exports:", instance.exports);
+        // Load WASM
+        const wasm = await initWasm();
 
-        // Coba panggil fungsi ekspor
-        if (instance.exports.m) {
-            const result = instance.exports.m(10, 20);
+        // Cek apakah ada fungsi decode atau fungsi lain
+        if (wasm.decode) {
+            const result = wasm.decode(); // Sesuaikan dengan param yang dibutuhkan
             return new Response(`Hasil dari WASM: ${result}`);
         }
 
