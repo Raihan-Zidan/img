@@ -1,37 +1,35 @@
-import * as jpeg from './jpeg-js-bundled.js';
+import { decode } from "https://esm.sh/@jsquash/jpeg";
 
 export default {
   async fetch(request) {
-    try {
-      const url = new URL(request.url);
-      const imageUrl = url.searchParams.get('url');
+    const url = new URL(request.url);
+    const imageUrl = url.searchParams.get('url');
 
-      if (!imageUrl) {
-        return new Response('Missing ?url parameter', { status: 400 });
-      }
-
-      // Fetch image
-      const imageResponse = await fetch(imageUrl);
-      if (!imageResponse.ok) {
-        return new Response('Failed to fetch image', { status: 400 });
-      }
-
-      const arrayBuffer = await imageResponse.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
-
-      // Decode JPEG
-      const rawImageData = jpeg.default.decode(uint8Array, { useTArray: true });
-
-      return new Response(JSON.stringify({
-        width: rawImageData.width,
-        height: rawImageData.height,
-        dataLength: rawImageData.data.length
-      }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-    } catch (error) {
-      return new Response(`Error: ${error.message}`, { status: 500 });
+    if (!imageUrl) {
+      return new Response("Missing ?url parameter", { status: 400 });
     }
-  }
+
+    // Fetch image from URL
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      return new Response("Failed to fetch image", { status: 400 });
+    }
+
+    const arrayBuffer = await imageResponse.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    // Decode JPEG using @jsquash/jpeg
+    const decodedImage = await decode(uint8Array);
+
+    return new Response(
+      JSON.stringify({
+        width: decodedImage.width,
+        height: decodedImage.height,
+        dataLength: decodedImage.data.byteLength,
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  },
 };
