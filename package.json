@@ -1,6 +1,11 @@
 {
   "name": "image-compressor",
   "version": "1.0.0",
+  "dependencies": {
+    "hono": "^3.7.3",
+    "jpeg-js": "^0.4.4",
+    "axios": "^1.6.5"
+  },
   "scripts": {
     "start": "node data.js",
     "postinstall": "npm install"
