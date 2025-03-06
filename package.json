@@ -2,6 +2,7 @@
   "name": "image-compressor",
   "version": "1.0.0",
   "scripts": {
-    "start": "node data.js"
+    "start": "node data.js",
+    "postinstall": "npm install"
   }
 }
