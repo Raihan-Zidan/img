@@ -12,4 +12,9 @@ bucket = "./"  # Direktori tempat file WASM berada
 
 compatibility_flags = [ "nodejs_compat" ]
 
+[[imports]]
+module = "@jsquash/jpeg"
+url = "https://esm.sh/@jsquash/jpeg@0.4.1"
+
+
 
