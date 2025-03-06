@@ -1,0 +1,7 @@
+{
+  "name": "image-compressor",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node data.js"
+  }
+}
